@@ -5,12 +5,12 @@ x-airflow-common:
   &airflow-common
   build:
     context: .. # O Dockerfile está na pasta raiz
-  environment:
-    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_DB_USER}:${AIRFLOW_DB_PASSWORD}@postgres/airflow
-    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER}:${AIRFLOW_DB_PASSWORD}@postgres/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     # Força a credencial do GCP a olhar para o caminho de DENTRO do container
-    - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/credentials-tmdb.json
+    GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/credentials-tmdb.json
   env_file:
     - ../.env
   volumes:
@@ -42,7 +42,7 @@ services:
     <<: *airflow-common
     command: version
     environment:
-      <<: *airflow-common.environment
+      <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_UI_USER}

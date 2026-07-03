@@ -251,3 +251,54 @@ Strict use of `Connections` and `Variables` in Airflow, alongside `.env` files m
 
 **Nested Field Handling**
 TMDB returns arrays for fields like `genres`, `production_countries`, and `spoken_languages`. The Silver layer explodes these into proper bridge tables, enabling clean many-to-many joins in the Gold layer without data duplication.
+
+---
+
+## 🚀 How to Run Locally (MVP)
+
+Currently, we have completed the Python extraction logic and set up the Airflow orchestration infrastructure using Docker. Follow these steps to run the project on your local machine:
+
+### 1. Environment Setup (`.env`)
+In the root directory of the project, create a file named `.env` containing your TMDB API keys, GCS bucket name, and Airflow credentials:
+
+```env
+TMDB_API_KEY=your-api-key
+TMDB_ACCESS_TOKEN=your-read-access-token
+
+GCS_BUCKET_NAME=your-bucket-name
+GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/credentials-tmdb.json
+
+# --- Airflow Config ---
+AIRFLOW_DB_USER=airflow
+AIRFLOW_DB_PASSWORD=airflow
+AIRFLOW_UI_USER=admin
+AIRFLOW_UI_PASSWORD=admin
+```
+
+> **Note:** You will also need a `credentials-tmdb.json` file in the root directory containing your Google Cloud Service Account key.
+
+### 2. Starting the Infrastructure with Docker
+The orchestrator (Apache Airflow) is containerized via `docker-compose`. To build and start the containers, ensure you are in the root directory and run:
+
+```bash
+docker-compose --env-file .env -f infra/docker-compose.yml up -d --build
+```
+
+This command will:
+- Pull the Postgres and Apache Airflow base images.
+- Build the custom image (`Dockerfile`), installing Python dependencies from `requirements.txt`.
+- Start the Database, Scheduler, and Webserver in the background (`-d`).
+
+### 3. Accessing the Airflow UI
+Once the containers are up and healthy, you can access the Airflow graphical interface in your browser:
+
+- **URL:** `http://localhost:8080`
+- **Username:** `admin` (as configured in `.env`)
+- **Password:** `admin` (as configured in `.env`)
+
+Your local `dags/` folder is mapped as a volume. Any DAG script you create locally will automatically sync and appear in the Airflow dashboard.
+
+To stop the infrastructure and free up your PC's resources, run:
+```bash
+docker-compose -f infra/docker-compose.yml down
+```
