@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Bloco com configurações base que o webserver, scheduler e init vão compartilhar
+x-airflow-common:
+  &airflow-common
+  build:
+    context: .. # O Dockerfile está na pasta raiz
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_DB_USER}:${AIRFLOW_DB_PASSWORD}@postgres/airflow
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    # Força a credencial do GCP a olhar para o caminho de DENTRO do container
+    - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/credentials-tmdb.json
+  env_file:
+    - ../.env
+  volumes:
+    # Mapeamentos: "Caminho do seu PC : Caminho dentro do Docker"
+    - ../dags:/opt/airflow/dags
+    - ../extraction:/opt/airflow/extraction
+    - ../credentials-tmdb.json:/opt/airflow/credentials-tmdb.json
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  # 1. Banco de Dados
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${AIRFLOW_DB_USER}
+      - POSTGRES_PASSWORD=${AIRFLOW_DB_PASSWORD}
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+
+  # 2. Inicializador (Roda uma vez só pra criar as tabelas e o usuário admin)
+  airflow-init:
+    <<: *airflow-common
+    command: version
+    environment:
+      <<: *airflow-common.environment
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_UI_USER}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_UI_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # 3. Interface Gráfica
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # 4. Orquestrador
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-db-volume:
