@@ -1,6 +1,9 @@
 import requests
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 import os
+
+# Test script with fight club movie to test connection with TMDB APIs 
 
 load_dotenv()
 
@@ -15,4 +18,3 @@ headers = {
 
 response = requests.get(URL, headers=headers)
 print(response.json())
-

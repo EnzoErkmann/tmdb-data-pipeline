@@ -102,6 +102,69 @@ This distinction drives the ingestion frequency design: cold data is loaded once
 
 ---
 
+## GCS Bucket Structure
+
+The bucket is organized by data type, mirroring the endpoint that generated each file. Every folder receives data from a specific Python script and feeds a specific Bronze table in BigQuery.
+
+```
+gs://tmdb-data-pipeline/
+│
+├── raw/
+│   │
+│   ├── movie_ids/
+│   │   └── 2026-07-02.json.gz         ← TMDB Daily Export (.gz)
+│   │                                     Script: load_movie_ids.py
+│   │                                     Frequency: one-time
+│   │                                     BQ Bronze: raw_movie_ids
+│   │
+│   ├── movies/
+│   │   └── 2026-07-02/
+│   │       ├── 550.json               ← /movie/{id}
+│   │       └── 551.json                  Script: load_movie_details.py
+│   │                                     Frequency: one-time + monthly incremental
+│   │                                     BQ Bronze: raw_movies
+│   │
+│   ├── credits/
+│   │   └── 2026-07-02/
+│   │       ├── 550.json               ← /movie/{id}/credits
+│   │       └── 551.json                  Script: load_movie_details.py (same run)
+│   │                                     Frequency: one-time + monthly incremental
+│   │                                     BQ Bronze: raw_credits
+│   │
+│   ├── genres/
+│   │   └── genres.json                ← /genre/movie/list
+│   │                                     Script: load_genres.py
+│   │                                     Frequency: one-time
+│   │                                     BQ Bronze: raw_genres
+│   │
+│   ├── trending/
+│   │   └── 2026-07-02.json            ← /trending/movie/day
+│   │                                     Script: load_trending.py
+│   │                                     Frequency: daily
+│   │                                     BQ Bronze: raw_trending
+│   │
+│   ├── popular/
+│   │   └── 2026-07-02.json            ← /movie/popular
+│   │                                     Script: load_trending.py (same run)
+│   │                                     Frequency: daily
+│   │                                     BQ Bronze: raw_popular
+│   │
+│   └── now_playing/
+│       └── 2026-07-02.json            ← /movie/now_playing
+│                                         Script: load_trending.py (same run)
+│                                         Frequency: daily
+│                                         BQ Bronze: raw_now_playing
+```
+
+### Design Decisions
+- **One file per date** — enables reprocessing a specific day without touching others
+- **One folder per endpoint** — clear lineage from source to storage to BigQuery
+- **Credits saved separately from movies** — different schema, different Bronze table, easier to load independently
+- **`load_movie_details.py` handles both `/movie/{id}` and `/movie/{id}/credits`** — they are always fetched together in the same loop, so it makes sense to keep them in one script but save to separate folders
+- **`load_trending.py` handles popular, trending and now_playing** — all three are hot data, daily, and follow the same pagination pattern
+
+---
+
 ## Dashboard Metrics & Analytical Questions
 
 ### 🎬 Genre Analysis
