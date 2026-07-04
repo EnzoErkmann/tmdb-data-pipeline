@@ -233,17 +233,30 @@ dbt/tmdb_project/
 
 ### 🥈 Silver Layer (Staging)
 - Null data cleansing, type standardization, and entity separation.
-- Explodes nested fields (e.g., `genres`) into separate relational tables.
-- dbt models (MVP):
+- Explodes nested fields (e.g., `genres`, `credits`) into separate relational tables.
+- dbt models:
   - `stg_movies.sql` — core movie attributes
   - `stg_genres.sql` — genre dimension
   - `stg_movie_genres.sql` — bridge table (movie ↔ genre)
+  - `stg_credits_cast.sql` — unnested actors with gender mapping
+  - `stg_credits_crew.sql` — unnested directors
+  - `stg_movie_companies.sql` — unnested production companies
+  - `stg_movie_countries.sql` — unnested production countries
+  - `stg_trending.sql` & `stg_popular.sql` — hot data snapshots
 
 ### 🥇 Gold Layer (Marts)
 - Aggregated facts and dimensions ready for direct dashboard consumption.
-- dbt models (MVP):
-  - `mart_genre_by_decade.sql` — popularity and rating per genre per decade
-  - `mart_budget_over_time.sql` — average budget evolution per year
+- dbt models:
+  - `mart_movie_financials.sql` — budget, revenue, and ROI per film
+  - `mart_genre_performance.sql` — ROI and box office by genre
+  - `mart_company_performance.sql` — ROI and volume by production company
+  - `mart_actor_performance.sql` — actors' frequency in highly rated and popular films
+  - `mart_director_performance.sql` — director rankings by average ROI
+  - `mart_demographics_by_genre.sql` — cast gender distribution per genre
+  - `mart_country_performance.sql` — production volume and language growth by country
+  - `mart_release_seasonality.sql` — revenue and volume averages per month
+  - `mart_runtime_evolution.sql` — average runtime trends across decades
+  - `mart_trending_now.sql` — combined trending and popular films enriched with genres
 
 ---
 
