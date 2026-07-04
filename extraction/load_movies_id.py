@@ -1,9 +1,7 @@
 import gzip
-import io
-import json
 import os
 import requests
-
+import tempfile
 from datetime import datetime, timedelta
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
@@ -26,35 +24,35 @@ TMDB_EXPORT_URL = (
 )
 GCS_BLOB_NAME = f"{GCS_DESTINATION_FOLDER}/movie_ids_{year}_{month}_{day}.json"
 
-def download_and_parse_movie_ids(url: str) -> list[dict]:
-    """Downloads the TMDB .gz export and returns a list of movie ID dicts."""
-    print(f"Downloading: {url}")
-    response = requests.get(url, stream=True, timeout=120)
-    response.raise_for_status()  # raises HTTPError for 4xx/5xx
-    movie_ids = []
-    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as gz_file:
-        for raw_line in gz_file:
-            line = raw_line.decode("utf-8").strip()
-            if line:
-                movie_ids.append(json.loads(line))
-    print(f"Parsed {len(movie_ids):,} movie IDs.")
-    return movie_ids
-
-# Upload to GCS
-def upload_to_gcs(data: list[dict], bucket_name: str, blob_name: str) -> None:
-    """Serializes the movie ID list as newline-delimited JSON and uploads to GCS."""
-    client = storage.Client()  # authenticates via GOOGLE_APPLICATION_CREDENTIALS
+def download_and_upload_movie_ids(url: str, bucket_name: str, blob_name: str):
+    """Downloads the TMDB .gz export, extracts it to a local temp file, and uploads to GCS."""
+    print(f"Downloading stream from: {url}")
+    
+    client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
-    ndjson_content = "\n".join(json.dumps(record) for record in data)
-    blob.upload_from_string(ndjson_content, content_type="application/json", timeout=600)
-    print(f"Uploaded to gs://{bucket_name}/{blob_name}")
+    
+    # Usando um arquivo temporário físico para não explodir a memória (RAM) do Docker
+    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_out:
+        temp_filename = temp_out.name
+        
+        with requests.get(url, stream=True, timeout=120) as response:
+            response.raise_for_status()
+            
+            # Descompacta o GZIP "on-the-fly" e escreve no disco sem lotar a memória
+            with gzip.GzipFile(fileobj=response.raw) as gz_file:
+                for line in gz_file:
+                    temp_out.write(line)
 
+    print(f"Arquivo salvo temporariamente em {temp_filename}. Fazendo upload pro GCS...")
+    blob.upload_from_filename(temp_filename, content_type="application/json", timeout=600)
+    print(f"Sucesso: Uploaded to gs://{bucket_name}/{blob_name}")
+    
+    # Limpa o arquivo temporário
+    os.remove(temp_filename)
 
-# Main that will run both functions
 def main():
-    movie_ids = download_and_parse_movie_ids(TMDB_EXPORT_URL)
-    upload_to_gcs(movie_ids, GCS_BUCKET_NAME, GCS_BLOB_NAME)
+    download_and_upload_movie_ids(TMDB_EXPORT_URL, GCS_BUCKET_NAME, GCS_BLOB_NAME)
 
 if __name__ == "__main__":
     main()

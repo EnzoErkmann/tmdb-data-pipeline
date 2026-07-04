@@ -33,9 +33,10 @@ def upload_to_gcs(data: dict, bucket_name: str, blob_name: str) -> None:
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     
-    # Salvando como um JSON único (não é newline-delimited) porque é um payload bem simples
-    json_content = json.dumps(data)
-    blob.upload_from_string(json_content, content_type="application/json", timeout=120)
+    # Extraímos a lista de gêneros e salvamos em NDJSON (um por linha) para o BigQuery ler perfeitamente
+    genres_list = data.get("genres", [])
+    ndjson_content = "\n".join(json.dumps(record) for record in genres_list)
+    blob.upload_from_string(ndjson_content, content_type="application/json", timeout=120)
     print(f"Uploaded to gs://{bucket_name}/{blob_name}")
 
 def main():
