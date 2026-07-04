@@ -15,7 +15,7 @@ BQ_PROJECT = os.getenv("GCP_PROJECT_ID")
 
 with DAG(
     dag_id='monthly_dag', 
-    start_date=datetime(2027, 7, 4),
+    start_date=datetime(2026, 6, 4),
     schedule='0 0 1 * *',  # todo dia 1 do mês meia noite
     catchup=False,
     tags=["tmdb", "monthly"]
@@ -29,7 +29,7 @@ with DAG(
     movies_to_bq = GCSToBigQueryOperator(
         task_id="movies_to_bq",
         bucket=GCS_BUCKET,
-        source_objects=["raw/movies/*/*.json"], # Usando wildcard para capturar o que foi gerado
+        source_objects=["raw/movies/{{ ds }}/*.json"], # BQ não aceita dois asteriscos (*/*.json), precisa ser o dia exato
         destination_project_dataset_table=f"{BQ_PROJECT}.bronze.raw_movies",
         source_format="NEWLINE_DELIMITED_JSON",
         write_disposition="WRITE_TRUNCATE", # Tratando como snapshot full por enquanto (atualiza a tabela com o último estado de todos os filmes da pasta)
@@ -39,7 +39,7 @@ with DAG(
     credits_to_bq = GCSToBigQueryOperator(
         task_id="credits_to_bq",
         bucket=GCS_BUCKET,
-        source_objects=["raw/credits/*/*.json"],
+        source_objects=["raw/credits/{{ ds }}/*.json"],
         destination_project_dataset_table=f"{BQ_PROJECT}.bronze.raw_credits",
         source_format="NEWLINE_DELIMITED_JSON",
         write_disposition="WRITE_TRUNCATE",
