@@ -23,6 +23,45 @@ models:
       - name: movie_id
         tests:
           - not_null
-      - name: genre_id
+
+  - name: stg_credits_cast
+    description: "Atores desempacotados do JSON de créditos, com o gênero sexual traduzido para pt-br."
+    columns:
+      - name: movie_id
+        tests:
+          - not_null
+
+  - name: stg_credits_crew
+    description: "Equipe técnica desempacotada, filtrada exclusivamente para Diretores."
+    columns:
+      - name: movie_id
+        tests:
+          - not_null
+
+  - name: stg_movie_companies
+    description: "Produtoras e estúdios (production_companies) desempacotados."
+    columns:
+      - name: movie_id
+        tests:
+          - not_null
+
+  - name: stg_movie_countries
+    description: "Países de gravação/produção (production_countries) desempacotados."
+    columns:
+      - name: movie_id
+        tests:
+          - not_null
+
+  - name: stg_trending
+    description: "Snapshot de dados voláteis contendo os filmes trending (em alta)."
+    columns:
+      - name: movie_id
+        tests:
+          - not_null
+
+  - name: stg_popular
+    description: "Snapshot de dados voláteis contendo os filmes mais populares do TMDB."
+    columns:
+      - name: movie_id
         tests:
           - not_null
