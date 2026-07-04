@@ -1,3 +1,8 @@
 .env
 
 credentials-tmdb.json
+
+# Ignora caches do Python no projeto inteiro (o barra no final indica que é uma pasta em qualquer lugar)
+__pycache__/
+
+venv/
