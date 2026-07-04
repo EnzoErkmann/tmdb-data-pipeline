@@ -1,0 +1,12 @@
+tmdb:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: tmdb-data-pipeline-501222
+      dataset: bronze
+      threads: 1
+      keyfile: /opt/airflow/credentials-tmdb.json
+      timeout_seconds: 300
+      location: US

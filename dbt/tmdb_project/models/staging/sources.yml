@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: tmdb-data-pipeline-501222
+    schema: bronze
+    tables:
+      - name: raw_movies
+      - name: raw_credits
+      - name: raw_genres
+      - name: raw_trending
+      - name: raw_popular
+      - name: raw_now_playing
