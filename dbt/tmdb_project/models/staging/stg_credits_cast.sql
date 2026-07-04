@@ -1,0 +1,21 @@
+with source as (
+    select * from {{ source('bronze', 'raw_credits') }}
+),
+
+unnested_cast as (
+    select
+        cast(id as int64) as movie_id,
+        cast(c.id as int64) as actor_id,
+        c.name as actor_name,
+        case 
+            when cast(c.gender as int64) = 1 then 'Feminino'
+            when cast(c.gender as int64) = 2 then 'Masculino'
+            when cast(c.gender as int64) = 3 then 'Não-Binário'
+            else 'Desconhecido'
+        end as gender,
+        c.character
+    from source,
+    unnest(`cast`) as c
+)
+
+select * from unnested_cast

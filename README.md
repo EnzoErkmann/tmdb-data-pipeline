@@ -229,31 +229,21 @@ dbt/tmdb_project/
 ### 🥉 Bronze Layer (Raw)
 - Raw data from the API, loaded in its original format.
 - Tables partitioned by ingestion date for historical tracking.
-- Main tables: `raw_movies`, `raw_credits`, `raw_genres`.
+- Main tables: `raw_movies`, `raw_credits`, `raw_genres`, `raw_trending`, `raw_popular`, `raw_now_playing`, `raw_movie_ids`.
 
 ### 🥈 Silver Layer (Staging)
 - Null data cleansing, type standardization, and entity separation.
-- Explodes nested fields (e.g., `genres`, `production_countries`, `spoken_languages`) into separate relational tables.
-- dbt models:
+- Explodes nested fields (e.g., `genres`) into separate relational tables.
+- dbt models (MVP):
   - `stg_movies.sql` — core movie attributes
   - `stg_genres.sql` — genre dimension
-  - `stg_credits.sql` — cast and crew
   - `stg_movie_genres.sql` — bridge table (movie ↔ genre)
-  - `stg_production_countries.sql` — bridge table (movie ↔ country)
 
 ### 🥇 Gold Layer (Marts)
 - Aggregated facts and dimensions ready for direct dashboard consumption.
-- dbt models:
+- dbt models (MVP):
   - `mart_genre_by_decade.sql` — popularity and rating per genre per decade
-  - `mart_box_office.sql` — top revenue films with budget comparison
   - `mart_budget_over_time.sql` — average budget evolution per year
-  - `mart_director_ratings.sql` — director performance ranked by average rating
-  - `mart_director_roi.sql` — director ROI ranking
-  - `mart_international_films.sql` — non-US/EU films ranked by rating and revenue
-  - `mart_low_rated_genres.sql` — genres with highest volume of bad films
-  - `mart_outliers_budget_popularity.sql` — scatter data for budget vs popularity analysis
-  - `mart_hidden_gems.sql` — high rating + low revenue + low vote count films
-  - `mart_guilty_pleasures.sql` — low rating + high revenue films
 
 ---
 
