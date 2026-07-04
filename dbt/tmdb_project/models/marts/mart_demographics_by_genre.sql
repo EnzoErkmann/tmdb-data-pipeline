@@ -22,4 +22,4 @@ joined as (
 )
 
 select * from joined
-order by g.genre_name, total_actors desc
+order by genre_name, total_actors desc
