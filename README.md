@@ -262,6 +262,9 @@ dbt/tmdb_project/
 
 ## Implemented Data Engineering Best Practices
 
+**Materialization Strategy (Views vs Tables)**
+To optimize BigQuery costs and performance, dbt was configured with distinct materialization strategies per layer. The **Silver layer** is materialized as `view` to avoid duplicating raw data in storage, acting as a lightweight virtual lens for data cleaning. The **Gold layer** is materialized as `table`, physically persisting the results of heavy JOINs and complex aggregations. This guarantees that BI tools and dashboards experience instant load times without triggering expensive, repetitive query processing on every click.
+
 **Hot vs Cold Data Separation**
 The pipeline distinguishes between fields that change frequently (popularity, ratings) and fields that are static after release (budget, credits, genres). This avoids full reloads and reduces unnecessary API calls, reflecting a production-grade architectural decision.
 
