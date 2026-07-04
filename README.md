@@ -83,6 +83,10 @@ This distinction drives the ingestion frequency design: cold data is loaded once
 - For each changed ID, re-fetch `/movie/{id}` and `/movie/{id}/credits`
 - Updates corrections to budget, revenue, credits, or metadata without reprocessing the full dataset
 
+### 🛠️ Data Transformation (dbt)
+- `dbt_transform_dag` runs daily at **06:30 AM**, exactly 30 minutes after the daily extraction finishes.
+- Rebuilds all Silver views and Gold tables ensuring dashboards are powered by the freshest data without overlapping with the heavy monthly extraction run.
+
 ---
 
 ## TMDB Endpoints Used
@@ -164,6 +168,30 @@ gs://tmdb-data-pipeline/
 - **`load_trending.py` handles popular, trending and now_playing** — all three are hot data, daily, and follow the same pagination pattern
 
 ---
+
+## dbt Project Structure
+
+The data transformation layer is built with dbt Core, following the Medallion Architecture. The project is isolated in its own directory and triggered by Airflow.
+
+```text
+dbt/tmdb_project/
+├── dbt_project.yml                 ← Main project config (defines schemas silver/gold)
+├── profiles.yml                    ← BigQuery connection credentials
+├── macros/
+│   └── generate_schema_name.sql    ← Macro to enforce strict schema names
+└── models/
+    ├── staging/                    ← 🥈 Silver Layer (cleanses Bronze data)
+    │   ├── sources.yml             ← Maps BigQuery Bronze tables
+    │   ├── schema.yml              ← Data Quality tests (unique, not_null)
+    │   ├── stg_movies.sql
+    │   ├── stg_genres.sql
+    │   └── stg_movie_genres.sql
+    │
+    └── marts/                      ← 🥇 Gold Layer (business logic and aggregations)
+        ├── schema.yml              ← Data Dictionary for BI consumption
+        ├── mart_genre_by_decade.sql
+        └── mart_budget_over_time.sql
+```
 
 ## Dashboard Metrics & Analytical Questions
 
@@ -270,6 +298,7 @@ TMDB_API_KEY=your-api-key
 TMDB_ACCESS_TOKEN=your-read-access-token
 
 GCS_BUCKET_NAME=your-bucket-name
+GCP_PROJECT_ID=your-gcp-project-id
 GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/credentials-tmdb.json
 
 # --- Airflow Config ---
