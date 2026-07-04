@@ -17,6 +17,8 @@ x-airflow-common:
     # Mapeamentos: "Caminho do seu PC : Caminho dentro do Docker"
     - ../dags:/opt/airflow/dags
     - ../extraction:/opt/airflow/extraction
+    - ../dbt:/opt/airflow/dbt
+    - ../logs:/opt/airflow/logs
     - ../credentials-tmdb.json:/opt/airflow/credentials-tmdb.json
   depends_on:
     postgres:
