@@ -39,13 +39,21 @@ def get_latest_movie_ids_blob_name(bucket_name: str, prefix: str) -> str:
     return latest_blob.name
 
 
-def read_ids_from_gcs(bucket_name: str, blob_name: str) -> list[dict]:
-    """Reads the movie IDs NDJSON file from GCS and returns a list of records."""
+def read_filtered_ids_from_gcs(bucket_name: str, blob_name: str, min_popularity: float) -> list[dict]:
+    """Streams the NDJSON file from GCS and returns only filtered records to save RAM."""
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
-    content = blob.download_as_text()
-    return [json.loads(line) for line in content.splitlines() if line.strip()]
+    
+    filtered_ids = []
+    # blob.open("r") permite ler o arquivo remotamente linha por linha (streaming) sem lotar a memória
+    with blob.open("r") as f:
+        for line in f:
+            if line.strip():
+                item = json.loads(line)
+                if item.get("popularity", 0) >= min_popularity:
+                    filtered_ids.append(item)
+    return filtered_ids
 
 def upload_to_gcs(data: dict, bucket_name: str, blob_name: str) -> None:
     """Uploads a single JSON record to GCS."""
@@ -97,12 +105,9 @@ def fetch_movie_credits(movie_id: int) -> dict:
 def main():
     print("Reading movie IDs from GCS...")
     latest_blob_name = get_latest_movie_ids_blob_name(GCS_BUCKET_NAME, MOVIE_IDS_PREFIX)
-    all_ids = read_ids_from_gcs(GCS_BUCKET_NAME, latest_blob_name)
-    filtered_ids = [
-        item for item in all_ids
-        if item.get("popularity", 0) >= POPULARITY_THRESHOLD
-    ]
-    print(f"Total IDs: {len(all_ids)} | After filter: {len(filtered_ids)}")
+    
+    filtered_ids = read_filtered_ids_from_gcs(GCS_BUCKET_NAME, latest_blob_name, POPULARITY_THRESHOLD)
+    print(f"After filter: {len(filtered_ids)} movies to process")
     for i, item in enumerate(filtered_ids):
         movie_id = item["id"]
         try:

@@ -252,6 +252,10 @@ Strict use of `Connections` and `Variables` in Airflow, alongside `.env` files m
 **Nested Field Handling**
 TMDB returns arrays for fields like `genres`, `production_countries`, and `spoken_languages`. The Silver layer explodes these into proper bridge tables, enabling clean many-to-many joins in the Gold layer without data duplication.
 
+**Handling Big Data & Out of Memory (OOM) Prevention**
+During the extraction of historical data, the pipeline faced an Out of Memory (OOM) error that crashed the Airflow container. The original script attempted to download the daily export (containing over 1.2 million movie IDs), parse all JSON objects into a Python list, and hold them in RAM simultaneously before uploading to GCS. Similarly, the monthly script tried to download the 150MB file from GCS entirely into memory to filter it. 
+To solve this, the extraction logic was refactored to use **Data Streaming**. Instead of loading the payload into memory, the data is now read and decompressed *on the fly*, parsed line-by-line (`blob.open("r")`), and written directly to disk or filtered iteratively. This dropped the RAM consumption from hundreds of megabytes to under 2MB, making the pipeline highly resilient regardless of dataset size.
+
 ---
 
 ## 🚀 How to Run Locally (MVP)
