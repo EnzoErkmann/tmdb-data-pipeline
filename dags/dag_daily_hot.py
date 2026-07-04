@@ -16,7 +16,7 @@ BQ_PROJECT = os.getenv("GCP_PROJECT_ID")
 with DAG(
     dag_id='daily_dag', 
     start_date=datetime(2026, 7, 4),
-    schedule='0 0 * * *',  # todo dia meia noite
+    schedule='0 6 * * *',  # todo dia às 06:00 da manhã
     catchup=False,
     tags=["tmdb", "daily"]
 ) as dag:
