@@ -195,32 +195,29 @@ dbt/tmdb_project/
 
 ## Dashboard Metrics & Analytical Questions
 
-### 🎬 Genre Analysis
-- **Most popular genres by decade** — group by `release_date` decade and genre, rank by average `popularity` and `vote_average`
-- **Genres with the highest volume of low-rated films** — filter `vote_average < 5` and `vote_count > 100`, group by genre
-- **Genre trends over time** — count of releases per genre per year
-- **ROI by genre** — `(revenue - budget) / budget` grouped by genre
+The Gold layer was specifically designed to answer the following business questions in Looker Studio:
 
-### 💰 Budget & Box Office
-- **Budget evolution over time** — average `budget` per year, adjusted for volume
-- **Biggest box offices of all time** — rank by `revenue`, with budget comparison
-- **Budget vs popularity outliers** — low-budget films with high `revenue` or `popularity` (scatter plot)
+### 💰 Financial & Box Office Performance
+- **Budget vs Revenue per film:** What is the absolute profit and ROI (Return on Investment) for every movie? (`mart_movie_financials`)
+- **ROI by Genre:** Which cinematic genres are the most profitable on average? (`mart_genre_performance`)
+- **ROI by Production Company:** Which studios yield the highest average ROI on their film investments? (`mart_company_performance`)
 
-### 🎥 Directors
-- **Worst directors by average rating** — aggregate `vote_average` per director (minimum film count filter to avoid noise, e.g., `>= 5 films`)
-- **Best directors by ROI** — directors whose films consistently outperform budget expectations
-- **Most prolific directors** — count of films per director over time
+### 🎬 Cast & Crew Insights
+- **Top Actors:** Which actors appear most frequently in critically acclaimed films and high-popularity hits over the last 5 years? (`mart_actor_performance`)
+- **Top Directors:** Which directors deliver the highest average ROI and critical approval? (`mart_director_performance`)
+- **Demographics by Genre:** How is cast gender (Female, Male, Non-Binary) distributed across different movie genres? (`mart_demographics_by_genre`)
 
-### 🌍 Regional & International Films
-- **Non-American and non-European films with highest ratings and revenue** — filter `production_countries` excluding US, UK, FR, DE, IT, ES; rank by `vote_average` and `revenue`
-- **Original language diversity** — distribution of `original_language` across the dataset
-- **Emerging film markets** — countries with increasing production volume over decades
+### 🌍 Global Production & Market Trends
+- **Top Producing Countries:** Which countries produce the most films globally? (`mart_country_performance`)
+- **Non-English Market Growth:** How fast are non-Portuguese/non-English productions (South American, Asian, African) growing per year? (`mart_country_performance`)
 
-### 📊 Outliers & Interesting Correlations
-- **Poor films with high box office** — `vote_average < 5` but `revenue` in top 20% (guilty pleasures)
-- **Critically acclaimed films with low revenue** — `vote_average > 7.5` but `revenue` in bottom 20%
-- **Runtime vs rating correlation** — do longer films tend to score higher?
-- **Hidden gems** — high `vote_average` + low `vote_count` + low `revenue` (under the radar films)
+### 📅 Seasonality & Evolution
+- **Release Seasonality:** What is the average revenue and volume of movie releases by month? Are there specific "blockbuster" months? (`mart_release_seasonality`)
+- **Runtime Evolution:** Are movies getting longer or shorter on average across the decades? (`mart_runtime_evolution`)
+- **Genre Trends by Decade:** Which genres were trending in the 80s vs the 2010s? (`mart_genre_by_decade`)
+
+### 🔥 Current Hot Data
+- **Trending & Popular Now:** What are the most popular and trending films this week/month, enriched with their specific genres? (`mart_trending_now`)
 
 ---
 
