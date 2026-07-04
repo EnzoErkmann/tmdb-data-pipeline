@@ -4,7 +4,7 @@ with source as (
 
 unnested_cast as (
     select
-        cast(id as int64) as movie_id,
+        cast(s.id as int64) as movie_id,
         cast(c.id as int64) as actor_id,
         c.name as actor_name,
         case 
@@ -14,7 +14,7 @@ unnested_cast as (
             else 'Desconhecido'
         end as gender,
         c.character
-    from source,
+    from source s,
     unnest(`cast`) as c
 )
 

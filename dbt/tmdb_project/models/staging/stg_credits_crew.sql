@@ -4,7 +4,7 @@ with source as (
 
 unnested_crew as (
     select
-        cast(id as int64) as movie_id,
+        cast(s.id as int64) as movie_id,
         cast(c.id as int64) as crew_id,
         c.name as crew_name,
         case 
@@ -14,7 +14,7 @@ unnested_crew as (
             else 'Desconhecido'
         end as gender,
         c.job
-    from source,
+    from source s,
     unnest(crew) as c
     where c.job = 'Director'
 )

@@ -4,11 +4,11 @@ with source as (
 
 unnested_companies as (
     select
-        cast(id as int64) as movie_id,
+        cast(s.id as int64) as movie_id,
         cast(pc.id as int64) as company_id,
         pc.name as company_name,
         pc.origin_country
-    from source,
+    from source s,
     unnest(production_companies) as pc
 )
 

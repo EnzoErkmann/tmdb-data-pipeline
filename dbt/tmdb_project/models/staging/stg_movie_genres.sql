@@ -4,9 +4,9 @@ with source as (
 
     unnested as (
     select
-        cast(id as int64) as movie_id,
+        cast(s.id as int64) as movie_id,
         cast(genre.id as int64) as genre_id
-    from source,
+    from source s,
     unnest(genres) as genre
     )
 
