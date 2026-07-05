@@ -116,20 +116,20 @@ gs://tmdb-data-pipeline/
 ├── raw/
 │   │
 │   ├── movie_ids/
-│   │   └── 2026-07-02.json.gz         ← TMDB Daily Export (.gz)
+│   │   └── 2026-07-04.json.gz         ← TMDB Daily Export (.gz)
 │   │                                     Script: load_movie_ids.py
 │   │                                     Frequency: one-time
 │   │                                     BQ Bronze: raw_movie_ids
 │   │
 │   ├── movies/
-│   │   └── 2026-07-02/
+│   │   └── 2026-07-04/
 │   │       ├── 550.json               ← /movie/{id}
 │   │       └── 551.json                  Script: load_movie_details.py
 │   │                                     Frequency: one-time + monthly incremental
 │   │                                     BQ Bronze: raw_movies
 │   │
 │   ├── credits/
-│   │   └── 2026-07-02/
+│   │   └── 2026-07-04/
 │   │       ├── 550.json               ← /movie/{id}/credits
 │   │       └── 551.json                  Script: load_movie_details.py (same run)
 │   │                                     Frequency: one-time + monthly incremental
@@ -142,19 +142,19 @@ gs://tmdb-data-pipeline/
 │   │                                     BQ Bronze: raw_genres
 │   │
 │   ├── trending/
-│   │   └── 2026-07-02.json            ← /trending/movie/day
+│   │   └── 2026-07-04.json            ← /trending/movie/day
 │   │                                     Script: load_trending.py
 │   │                                     Frequency: daily
 │   │                                     BQ Bronze: raw_trending
 │   │
 │   ├── popular/
-│   │   └── 2026-07-02.json            ← /movie/popular
+│   │   └── 2026-07-04.json            ← /movie/popular
 │   │                                     Script: load_trending.py (same run)
 │   │                                     Frequency: daily
 │   │                                     BQ Bronze: raw_popular
 │   │
 │   └── now_playing/
-│       └── 2026-07-02.json            ← /movie/now_playing
+│       └── 2026-07-04.json            ← /movie/now_playing
 │                                         Script: load_trending.py (same run)
 │                                         Frequency: daily
 │                                         BQ Bronze: raw_now_playing
