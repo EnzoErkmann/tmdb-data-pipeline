@@ -2,22 +2,22 @@ version: 2
 
 models:
   - name: mart_movie_financials
-    description: "Cálculos financeiros fundamentais por filme, incluindo Lucro Absoluto e ROI (Retorno sobre Investimento)."
+    description: "Fundamental financial calculations per movie, including Absolute Profit and ROI (Return on Investment)."
   - name: mart_genre_performance
-    description: "Desempenho financeiro (ROI, Receita Média) agregado por gênero cinematográfico."
+    description: "Financial performance (ROI, Average Revenue) aggregated by cinematic genre."
   - name: mart_company_performance
-    description: "Rank de produtoras (estúdios) por ROI médio, filtrando empresas com baixo volume de filmes."
+    description: "Production studios rank by average ROI, filtering out low-volume companies."
   - name: mart_actor_performance
-    description: "Volume de sucesso de cada ator, medindo participações em filmes aclamados pela crítica e de alta popularidade recente."
+    description: "Actor success volume, measuring roles in critically acclaimed and highly popular recent movies."
   - name: mart_director_performance
-    description: "Avaliação de diretores baseada em retorno financeiro (ROI) e aprovação do público (Vote Average)."
+    description: "Director evaluation based on financial return (ROI) and audience approval (Vote Average)."
   - name: mart_demographics_by_genre
-    description: "Distribuição demográfica do elenco (Feminino/Masculino/Não-Binário) cruzada com gêneros de filmes."
+    description: "Cast demographics distribution (Female/Male/Non-Binary) crossed with movie genres."
   - name: mart_country_performance
-    description: "Métricas de produção por país e evolução anual, destacando mercados emergentes."
+    description: "Production metrics by country and annual evolution, highlighting emerging markets."
   - name: mart_release_seasonality
-    description: "Média de receitas, popularidade e volume de lançamentos agrupados por mês (1 a 12) para análise de sazonalidade."
+    description: "Average revenues, popularity, and release volume grouped by month (1 to 12) for seasonality analysis."
   - name: mart_runtime_evolution
-    description: "Evolução histórica da duração média (runtime) dos filmes agrupada por década."
+    description: "Historical evolution of average movie runtime grouped by decade."
   - name: mart_trending_now
-    description: "Snapshot atualizado unindo filmes Populares e Trending, já enriquecidos com seus respectivos gêneros."
+    description: "Updated snapshot joining Popular and Trending movies, enriched with their respective genres."

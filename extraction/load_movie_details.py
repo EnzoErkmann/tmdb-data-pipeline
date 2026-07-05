@@ -6,7 +6,6 @@ from datetime import date
 import requests
 from dotenv import load_dotenv
 from google.cloud import storage
-# pyrefly: ignore [missing-import]
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 load_dotenv()
@@ -16,11 +15,11 @@ GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME")
 BASE_URL = "https://api.themoviedb.org/3"
 TODAY = date.today().isoformat()
 
-# Prefixo onde os IDs são salvos
+# Prefix where IDs are saved
 MOVIE_IDS_PREFIX = "raw/movie_ids/"
 
 POPULARITY_THRESHOLD = 10.0
-SLEEP_BETWEEN_REQUESTS = 0.05  # 20 filmes/seg, seguro dentro do limite de 40 req/s
+SLEEP_BETWEEN_REQUESTS = 0.05  # 20 movies/sec, safe within the 40 req/s limit
 
 # GCS
 
@@ -30,9 +29,9 @@ def get_latest_movie_ids_blob_name(bucket_name: str, prefix: str) -> str:
     bucket = client.bucket(bucket_name)
     blobs = list(bucket.list_blobs(prefix=prefix))
     if not blobs:
-        raise ValueError(f"Nenhum arquivo encontrado em gs://{bucket_name}/{prefix}")
+        raise ValueError(f"No files found at gs://{bucket_name}/{prefix}")
     
-    # Como o nome tem formato YYYY_MM_DD, ordenar por nome alfabeticamente traz o mais recente por último
+    # Since the name format is YYYY_MM_DD, sorting alphabetically brings the most recent one to the end
     blobs.sort(key=lambda b: b.name)
     latest_blob = blobs[-1]
     print(f"Latest movie IDs file found: {latest_blob.name}")
@@ -46,7 +45,7 @@ def read_filtered_ids_from_gcs(bucket_name: str, blob_name: str, min_popularity:
     blob = bucket.blob(blob_name)
     
     filtered_ids = []
-    # blob.open("r") permite ler o arquivo remotamente linha por linha (streaming) sem lotar a memória
+    # blob.open("r") allows reading the remote file line by line (streaming) without blowing up memory
     with blob.open("r") as f:
         for line in f:
             if line.strip():

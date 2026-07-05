@@ -367,7 +367,7 @@ docker-compose -f infra/docker-compose.yml down
 
 ## 📈 Analytics Results (Looker Studio)
 
-> **Disclaimer:** All data visualizations and aggregations below are based on a curated sample of the TMDB database, specifically filtered for movies with `popularity > 10` during the initial API extraction. This ensures we are analyzing culturally relevant and globally recognized films, filtering out amateur or obscure entries.
+> **Disclaimer & Data Snapshot:** All data visualizations and aggregations below are based on a curated sample of the TMDB database, specifically filtered for movies with `popularity > 10` during the initial API extraction. Furthermore, the complete data extraction was executed on **July 4, 2026**. Therefore, the metrics, box office numbers, and trending charts reflect the state of the cinema industry exactly on that date.
 
 Below are the final visualizations built in Looker Studio, directly consuming the 12 Gold layer tables from BigQuery. Each chart provides a clear and actionable insight into a specific area of the cinema industry.
 
@@ -400,7 +400,8 @@ Below are the final visualizations built in Looker Studio, directly consuming th
   > ![Result - Demographics](./assets/demographics_by_genre.png)
 - **Top Actors Performance:**
   > ![Result - Actor Performance](./assets/actor_performance.png)
-- **Top Directors by ROI:**
+- **Top Directors by Average Rating:**
+  > *Directors ordered by their critical acclaim (Average Rating), also showcasing their total movie count and box office performance.*
   > ![Result - Director Performance](./assets/director_performance.png)
 
 ### 🌍 Global Market & Seasonality

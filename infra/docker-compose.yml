@@ -1,20 +1,20 @@
 version: '3.8'
 
-# Bloco com configurações base que o webserver, scheduler e init vão compartilhar
+# Base configuration block that webserver, scheduler, and init will share
 x-airflow-common:
   &airflow-common
   build:
-    context: .. # O Dockerfile está na pasta raiz
+    context: .. # The Dockerfile is in the root folder
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER}:${AIRFLOW_DB_PASSWORD}@postgres/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    # Força a credencial do GCP a olhar para o caminho de DENTRO do container
+    # Forces the GCP credential to look at the path INSIDE the container
     GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/credentials-tmdb.json
   env_file:
     - ../.env
   volumes:
-    # Mapeamentos: "Caminho do seu PC : Caminho dentro do Docker"
+    # Volume mappings: "Host Path : Container Path"
     - ../dags:/opt/airflow/dags
     - ../extraction:/opt/airflow/extraction
     - ../dbt:/opt/airflow/dbt
@@ -25,7 +25,7 @@ x-airflow-common:
       condition: service_healthy
 
 services:
-  # 1. Banco de Dados
+  # 1. Database
   postgres:
     image: postgres:13
     environment:
@@ -39,7 +39,7 @@ services:
       interval: 5s
       retries: 5
 
-  # 2. Inicializador (Roda uma vez só pra criar as tabelas e o usuário admin)
+  # 2. Initializer (Runs only once to create tables and admin user)
   airflow-init:
     <<: *airflow-common
     command: version
@@ -53,7 +53,7 @@ services:
       postgres:
         condition: service_healthy
 
-  # 3. Interface Gráfica
+  # 3. Web UI
   airflow-webserver:
     <<: *airflow-common
     command: webserver
@@ -68,7 +68,7 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
-  # 4. Orquestrador
+  # 4. Scheduler
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler

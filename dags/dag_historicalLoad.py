@@ -37,7 +37,7 @@ with DAG(
         source_objects=["raw/movie_ids/*.json"],
         destination_project_dataset_table=f"{BQ_PROJECT}.bronze.raw_movie_ids",
         source_format="NEWLINE_DELIMITED_JSON",
-        write_disposition="WRITE_TRUNCATE", # A exportação do TMDB é full, então truncate é o ideal
+        write_disposition="WRITE_TRUNCATE", # TMDB export is full, so truncate is ideal
         autodetect=True,
     )
 

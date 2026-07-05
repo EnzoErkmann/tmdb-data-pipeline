@@ -3,9 +3,7 @@ import os
 import requests
 import tempfile
 from datetime import datetime, timedelta
-# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
-# pyrefly: ignore [missing-import]
 from google.cloud import storage
 
 load_dotenv()
@@ -32,23 +30,23 @@ def download_and_upload_movie_ids(url: str, bucket_name: str, blob_name: str):
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     
-    # Usando um arquivo temporário físico para não explodir a memória (RAM) do Docker
+    # Using a physical temporary file to prevent Docker RAM from blowing up
     with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_out:
         temp_filename = temp_out.name
         
         with requests.get(url, stream=True, timeout=120) as response:
             response.raise_for_status()
             
-            # Descompacta o GZIP "on-the-fly" e escreve no disco sem lotar a memória
+            # Decompress GZIP on-the-fly and write to disk without filling up memory
             with gzip.GzipFile(fileobj=response.raw) as gz_file:
                 for line in gz_file:
                     temp_out.write(line)
 
-    print(f"Arquivo salvo temporariamente em {temp_filename}. Fazendo upload pro GCS...")
+    print(f"Temporary file saved at {temp_filename}. Uploading to GCS...")
     blob.upload_from_filename(temp_filename, content_type="application/json", timeout=600)
     print(f"Sucesso: Uploaded to gs://{bucket_name}/{blob_name}")
     
-    # Limpa o arquivo temporário
+    # Clean up the temporary file
     os.remove(temp_filename)
 
 def main():

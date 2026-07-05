@@ -1,4 +1,3 @@
-# pyrefly: ignore [missing-import]
 import sys
 import os
 from airflow import DAG
@@ -6,7 +5,7 @@ from datetime import datetime
 from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
-# Ensina o Python do Airflow a olhar para a pasta raiz (/opt/airflow) para que ele consiga enxergar a pasta "extraction"
+# Teaches Airflow Python to look at the root folder (/opt/airflow) so it can see the "extraction" module
 sys.path.insert(0, '/opt/airflow')
 from extraction.load_trending import main as load_trending_movies_func
 
@@ -16,7 +15,7 @@ BQ_PROJECT = os.getenv("GCP_PROJECT_ID")
 with DAG(
     dag_id='daily_dag', 
     start_date=datetime(2026, 7, 4),
-    schedule='0 6 * * *',  # todo dia às 06:00 da manhã
+    schedule='0 6 * * *',  # every day at 06:00 AM
     catchup=False,
     tags=["tmdb", "daily"]
 ) as dag:

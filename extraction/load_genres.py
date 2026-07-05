@@ -3,7 +3,6 @@ import json
 import requests
 from dotenv import load_dotenv
 from google.cloud import storage
-# pyrefly: ignore [missing-import]
 from tenacity import retry, wait_exponential, stop_after_attempt
 
 # Load environment variables
@@ -21,7 +20,7 @@ def fetch_genres() -> dict:
         "Authorization": f"Bearer {TMDB_ACCESS_TOKEN}"
     }
     params = {
-        "language": "en" # mantendo em inglês como os outros
+        "language": "en" # keeping in English like the others
     }
     print("Fetching genres from TMDB API...")
     response = requests.get(GENRES_URL, headers=headers, params=params, timeout=10)
@@ -33,7 +32,7 @@ def upload_to_gcs(data: dict, bucket_name: str, blob_name: str) -> None:
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     
-    # Extraímos a lista de gêneros e salvamos em NDJSON (um por linha) para o BigQuery ler perfeitamente
+    # Extract the genres list and save as NDJSON (one per line) for seamless BigQuery ingestion
     genres_list = data.get("genres", [])
     ndjson_content = "\n".join(json.dumps(record) for record in genres_list)
     blob.upload_from_string(ndjson_content, content_type="application/json", timeout=120)
