@@ -345,7 +345,74 @@ Once the containers are up and healthy, you can access the Airflow graphical int
 
 Your local `dags/` folder is mapped as a volume. Any DAG script you create locally will automatically sync and appear in the Airflow dashboard.
 
+> **Airflow DAG Execution:**
+> 
+> Our data pipeline is orchestrated by 3 specific DAGs to manage different ingestion cadences (Historical backfill, Monthly updates, and Daily trending snapshots).
+> 
+> **1. Historical / dbt Build Pipeline:**
+> ![Orchestration - Historical DAG](./assets/dag_dbt_rodando.png)
+> 
+> **2. Monthly Pipeline (Incremental load):**
+> ![Orchestration - Monthly DAG](./assets/dag_mensal_rodando.png)
+> 
+> **3. Daily Pipeline (Trending & Popular updates):**
+> ![Orchestration - Daily DAG](./assets/dag_diaria_rodando.png)
+
 To stop the infrastructure and free up your PC's resources, run:
 ```bash
 docker-compose -f infra/docker-compose.yml down
 ```
+
+---
+
+## 📈 Analytics Results (Looker Studio)
+
+> **Disclaimer:** All data visualizations and aggregations below are based on a curated sample of the TMDB database, specifically filtered for movies with `popularity > 10` during the initial API extraction. This ensures we are analyzing culturally relevant and globally recognized films, filtering out amateur or obscure entries.
+
+Below are the final visualizations built in Looker Studio, directly consuming the 12 Gold layer tables from BigQuery. Each chart provides a clear and actionable insight into a specific area of the cinema industry.
+
+### 💰 Financial & Box Office Performance
+- **Budget Inflation over Time:**
+  > ![Result - Budget Over Time](./assets/budget_over_time.png)
+  
+- **Movie Financials & ROI:**
+  > ![Result - Movie Financials](./assets/movie_financials.png)
+  > 
+  > **Interesting Outliers Discovered:**
+  > - **Highest Budget:** *Jurassic World Dominion* stood out as an extreme outlier for production costs.
+  >   ![Outlier - Highest Budget](./assets/outlier_maispagou.png)
+  > - **Highest Revenue:** Unprecedented box office returns.
+  >   ![Outlier - Highest Revenue](./assets/outlier_maisrendeu.png)
+  > - **Highest ROI (Ne Zha):** This specific film emerged as a massive anomaly, demonstrating how an incredibly low budget can yield astronomical box office revenue, resulting in a phenomenal ROI.
+  >   ![Outlier - Ne Zha ROI](./assets/outlierNeZha.png)
+
+- **ROI by Genre:**
+  > ![Result - Genre Performance](./assets/genre_performance.png)
+  
+- **Production Company Performance:**
+  > *Analysis based on Total Revenue generated:*
+  > ![Result - Company Performance (Revenue)](./assets/company_performance(revenue).png)
+  > *Analysis based on average Return on Investment (ROI):*
+  > ![Result - Company Performance (ROI)](./assets/company_performance(ROI).png)
+
+### 🎬 Cast, Crew & Demographics
+- **Demographics by Genre:**
+  > ![Result - Demographics](./assets/demographics_by_genre.png)
+- **Top Actors Performance:**
+  > ![Result - Actor Performance](./assets/actor_performance.png)
+- **Top Directors by ROI:**
+  > ![Result - Director Performance](./assets/director_performance.png)
+
+### 🌍 Global Market & Seasonality
+- **Top Producing Countries:**
+  > ![Result - Country Performance](./assets/country_performance.png)
+- **Release Seasonality:**
+  > ![Result - Release Seasonality](./assets/release_sazonality.png)
+- **Runtime Evolution:**
+  > ![Result - Runtime Evolution](./assets/runtime_evolution.png)
+- **Top Genre by Decade:**
+  > ![Result - Genre by Decade](./assets/genre_by_decade.png)
+
+### 🔥 Current Hot Data
+- **Trending & Popular Now:**
+  > ![Result - Trending Now](./assets/trending_now.png)
