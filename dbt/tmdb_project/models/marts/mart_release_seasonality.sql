@@ -25,7 +25,7 @@ seasonality as (
         avg(vote_average) as avg_rating
     from movies
     where release_date is not null
-    group by release_month
+    group by release_month, month_name_en
 )
 
 select * from seasonality

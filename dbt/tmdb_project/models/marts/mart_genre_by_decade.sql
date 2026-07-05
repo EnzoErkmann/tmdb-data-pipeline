@@ -14,7 +14,7 @@ with movies as (
         select
             m.movie_id,
             m.title,
-            floor(extract(year from m.release_date) / 10) * 10 as decade,
+            cast(floor(extract(year from m.release_date) / 10) * 10 as int64) as decade,
             m.popularity,
             m.vote_average,
             g.genre_name
@@ -26,10 +26,11 @@ with movies as (
 
 select
     decade,
-    genre_name,
+    genre_name as top_genre,
     count(distinct movie_id) as total_movies,
     avg(popularity) as avg_popularity,
     avg(vote_average) as avg_rating
 from joined
 group by decade, genre_name
-order by decade desc, total_movies desc
+qualify row_number() over (partition by decade order by count(distinct movie_id) desc) = 1
+order by decade desc

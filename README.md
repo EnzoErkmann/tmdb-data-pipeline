@@ -199,6 +199,7 @@ The Gold layer was specifically designed to answer the following business questi
 
 ### 💰 Financial & Box Office Performance
 - **Budget vs Revenue per film:** What is the absolute profit and ROI (Return on Investment) for every movie? (`mart_movie_financials`)
+- **Budget Inflation over Time:** How has the average budget of films evolved across decades? (`mart_budget_over_time`)
 - **ROI by Genre:** Which cinematic genres are the most profitable on average? (`mart_genre_performance`)
 - **ROI by Production Company:** Which studios yield the highest average ROI on their film investments? (`mart_company_performance`)
 
@@ -212,12 +213,22 @@ The Gold layer was specifically designed to answer the following business questi
 - **Non-English Market Growth:** How fast are non-Portuguese/non-English productions (South American, Asian, African) growing per year? (`mart_country_performance`)
 
 ### 📅 Seasonality & Evolution
-- **Release Seasonality:** What is the average revenue and volume of movie releases by month? Are there specific "blockbuster" months? (`mart_release_seasonality`)
+- **Release Seasonality:** What is the average revenue and volume of movie releases by month? (`mart_release_seasonality`)
 - **Runtime Evolution:** Are movies getting longer or shorter on average across the decades? (`mart_runtime_evolution`)
-- **Genre Trends by Decade:** Which genres were trending in the 80s vs the 2010s? (`mart_genre_by_decade`)
+- **Top Genre by Decade:** Which single genre dominated each decade by volume of releases? (`mart_genre_by_decade`)
 
 ### 🔥 Current Hot Data
 - **Trending & Popular Now:** What are the most popular and trending films this week/month, enriched with their specific genres? (`mart_trending_now`)
+
+---
+
+## 📊 Dashboard & Visualization Strategy (Looker Studio)
+
+To ensure the Looker Studio dashboard is clean, professional, and language-agnostic, the following Data Viz principles were applied directly in the data warehouse layer (dbt):
+- **Decadal vs Yearly Aggregation:** Line and bar charts spanning 100+ years (like budget evolution) were clustered into `decades` instead of exact years. This prevents chart clutter and delivers a clearer macro-trend narrative.
+- **Top 1 Filtering (QUALIFY):** Instead of plotting 19 intersecting lines for genre trends, the SQL isolates only the #1 Most Produced Genre per decade, ensuring clean Data Table visualizations.
+- **English Language Standardization:** Native TMDB genres and internal gender classifications were translated from Portuguese to English via SQL `CASE WHEN` statements in the Silver layer. This prevents Looker Studio from automatically localizing terms and guarantees a uniform English dashboard for international audiences.
+- **Hardcoded Date Labels:** Months are extracted as numerical dimensions (`1-12`) for strict chronological sorting, alongside hardcoded string names (`month_name_en`) to display properly on the X-axis regardless of the user's browser language.
 
 ---
 

@@ -3,11 +3,11 @@ with movies as (
 )
 
 select
-    extract(year from release_date) as release_year,
+    floor(extract(year from release_date) / 10) * 10 as decade,
     count(movie_id) as total_movies,
     avg(budget) as avg_budget,
     avg(revenue) as avg_revenue
 from movies
 where release_date is not null and budget > 0
-group by release_year
-order by release_year desc
+group by decade
+order by decade desc
